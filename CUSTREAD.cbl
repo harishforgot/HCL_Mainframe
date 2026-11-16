@@ -1,0 +1,106 @@
+
+IDENTIFICATION DIVISION.
+PROGRAM-ID. CUSTREAD.
+
+ENVIRONMENT DIVISION.
+INPUT-OUTPUT SECTION.
+FILE-CONTROL.
+
+    SELECT CUST-MASTER
+        ASSIGN TO "CUST-MASTER"
+        ORGANIZATION IS INDEXED
+        ACCESS MODE IS SEQUENTIAL
+        RECORD KEY IS CUST-MASTER-KEY
+        FILE STATUS IS WS-MASTER-STATUS.
+
+DATA DIVISION.
+FILE SECTION.
+
+FD CUST-MASTER.
+01 CUST-MASTER-RECORD.
+   05 CUST-MASTER-KEY PIC X(12).
+   05 CUST-NAME       PIC X(25).
+   05 CUST-STATUS     PIC X(13).
+
+WORKING-STORAGE SECTION.
+
+01 WS-MASTER-STATUS   PIC XX.
+01 WS-EOF             PIC X VALUE 'N'.
+
+01 WS-READ-COUNT      PIC 9(5) VALUE ZERO.
+01 WS-ERROR-COUNT     PIC 9(5) VALUE ZERO.
+
+PROCEDURE DIVISION.
+
+MAIN-PROCESS.
+
+    DISPLAY '========================================'
+    DISPLAY '       CUSTOMER MASTER READ JOB'
+    DISPLAY '========================================'
+
+    OPEN INPUT CUST-MASTER
+
+    IF WS-MASTER-STATUS NOT = '00'
+        DISPLAY 'ERROR OPENING CUSTOMER MASTER'
+        DISPLAY 'FILE STATUS: ' WS-MASTER-STATUS
+        STOP RUN
+    END-IF
+
+    DISPLAY 'CUSTOMER MASTER OPEN SUCCESSFUL'
+    DISPLAY ' '
+
+    DISPLAY 'CUSTOMER ID  CUSTOMER NAME             STATUS'
+    DISPLAY '----------------------------------------'
+
+    PERFORM UNTIL WS-EOF = 'Y'
+
+        READ CUST-MASTER NEXT RECORD
+
+            AT END
+                MOVE 'Y' TO WS-EOF
+
+            NOT AT END
+                PERFORM DISPLAY-CUSTOMER
+
+        END-READ
+
+        IF WS-MASTER-STATUS NOT = '00'
+           AND WS-MASTER-STATUS NOT = '10'
+            DISPLAY 'READ ERROR: ' WS-MASTER-STATUS
+            ADD 1 TO WS-ERROR-COUNT
+            MOVE 'Y' TO WS-EOF
+        END-IF
+
+    END-PERFORM
+
+    CLOSE CUST-MASTER
+
+    DISPLAY ' '
+    DISPLAY '========================================'
+    DISPLAY '       MASTER READ SUMMARY'
+    DISPLAY '========================================'
+
+    DISPLAY 'TOTAL RECORDS READ : '
+            WS-READ-COUNT
+
+    DISPLAY 'TOTAL READ ERRORS  : '
+            WS-ERROR-COUNT
+
+    DISPLAY '========================================'
+    DISPLAY 'MASTER READ COMPLETED'
+    DISPLAY '========================================'
+
+    STOP RUN.
+
+
+DISPLAY-CUSTOMER.
+
+    ADD 1 TO WS-READ-COUNT
+
+    DISPLAY '----------------------------------------'
+
+    DISPLAY 'CUSTOMER ID   : ' CUST-MASTER-KEY
+
+    DISPLAY 'CUSTOMER NAME : ' CUST-NAME
+
+    DISPLAY 'CUSTOMER STATUS: ' CUST-STATUS.
