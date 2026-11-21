@@ -1,0 +1,35 @@
+IDENTIFICATION DIVISION.
+PROGRAM-ID. DATEVALID.
+DATA DIVISION.
+    WORKING-STORAGE SECTION.
+        01 DMY PIC 9(8).
+        01 DMY-FORMAT REDEFINES DMY.
+            05 Y PIC 9(4).
+            05 M PIC 9(2).
+            05 D PIC 9(2).
+        01 T PIC 9(1) VALUE 1.
+        01 FEB_L PIC 9(2) VALUE 28.
+PROCEDURE DIVISION.
+    DISPLAY "Enter a date(YYYYMMDD): "
+    ACCEPT DMY
+    IF M>12 OR M<1 OR D<1 OR D>31 THEN
+        SET T TO 0
+    END-IF
+    IF (FUNCTION REM(Y,4)) IS = 0 AND ((FUNCTION REM(Y,400)) IS = 0 OR (FUNCTION REM(Y,100)) IS NOT = 0) THEN
+        SET FEB_L TO 29
+    END-IF
+    IF (FUNCTION REM(M,2) IS = 0) THEN
+        IF ((M IS = 2) AND (D > FEB_L)) OR (M<8 AND D>30) THEN
+            SET T TO 0
+        END-IF
+    ELSE
+        IF (M>7 AND D>30) THEN
+            SET T TO 0
+        END-IF
+    END-IF
+    IF T IS = 1 THEN
+    DISPLAY "VALID DATE"
+    ELSE 
+    DISPLAY "INVALID DATE"
+    END-IF
+STOP RUN.
