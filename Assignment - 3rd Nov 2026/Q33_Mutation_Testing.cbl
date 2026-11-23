@@ -1,0 +1,33 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. FIELD-CHECK.
+       
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-ORIGINAL.
+          05 ORG-ACC PIC 9(12).
+          05 ORG-AMOUNT  PIC 9(5).
+       01 WS-NEW.
+          05 NEW-ACC PIC 9(12).
+          05 NEW-AMOUNT  PIC 9(5).
+          
+       PROCEDURE DIVISION.
+            DISPLAY 'ENTER ORIGINAL ACC. NUMBER:'
+           ACCEPT ORG-ACC
+           DISPLAY 'ENTER ORIGINAL BALANCE:'
+           ACCEPT ORG-AMOUNT
+           DISPLAY 'ENTER NEW ACC. NUMBER:'
+           ACCEPT NEW-ACC
+           DISPLAY 'ENTER NEW BALANCE:'
+           ACCEPT NEW-AMOUNT
+           DISPLAY 'FIELD COMPARISON RESULTS'
+           IF ORG-ACC IS = NEW-ACC
+               DISPLAY 'ACCOUNT: NOT MODIFIED'
+           ELSE
+               DISPLAY 'INVALID TEST: DIFFERENT ACCOUNT NUMBER'
+           END-IF.
+           IF ORG-AMOUNT IS = NEW-AMOUNT
+               DISPLAY 'BALANCE: NOT MODIFIED'
+           ELSE
+               DISPLAY 'BALANCE: MODIFIED'
+           END-IF.
+           STOP RUN.
